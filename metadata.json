@@ -1,0 +1,6 @@
+{
+  "name": "智能待办",
+  "description": "基于时间与地理位置的智能待办提醒工具，根据实时位置与交通状况智能推算出发行程提醒。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
