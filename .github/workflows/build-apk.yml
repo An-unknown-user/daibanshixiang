@@ -22,14 +22,21 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Prepare Signing Keystore and Environment
+      - name: Prepare Android SDK Licenses and Keystore
         run: |
+          # 自动接受 Android SDK 协议，Ubuntu-latest 自带预置 Android SDK
+          SDK_DIR="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          mkdir -p "$SDK_DIR/licenses"
+          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$SDK_DIR/licenses/android-sdk-license"
+          echo "84831b9409646a246e0444224b33ea007077259b" >> "$SDK_DIR/licenses/android-sdk-license"
+          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$SDK_DIR/licenses/android-sdk-license"
+
+          # 准备 .env 环境变量
           if [ ! -f .env ]; then
             cp .env.example .env
           fi
+
+          # 生成调试签名 keystore
           if [ ! -f debug.keystore ]; then
             keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
           fi
