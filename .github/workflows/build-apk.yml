@@ -24,18 +24,23 @@ jobs:
 
       - name: Prepare Android SDK Licenses and Keystore
         run: |
-          # 自动接受 Android SDK 协议
           SDK_DIR="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          
+          # 赋予 runner 用户 SDK 目录完整写权限，避免 Permission denied
+          sudo chown -R $USER:$USER "$SDK_DIR" 2>/dev/null || true
           mkdir -p "$SDK_DIR/licenses"
+          
+          # 自动注入官方 Android SDK 协议
           echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$SDK_DIR/licenses/android-sdk-license"
           echo "84831b9409646a246e0444224b33ea007077259b" >> "$SDK_DIR/licenses/android-sdk-license"
           echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$SDK_DIR/licenses/android-sdk-license"
 
-          # 确保 .env 文件存在（使用 touch 保证 100% 成功，不依赖 .env.example）
+          # 配置 SDK 路径与环境变量文件
+          echo "sdk.dir=$SDK_DIR" > local.properties
           touch .env
           echo "APP_NAME=SmartTodo" >> .env
 
-          # 自动生成 debug.keystore 签名证书
+          # 自动生成 debug.keystore 证书
           if [ ! -f debug.keystore ]; then
             keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
           fi
